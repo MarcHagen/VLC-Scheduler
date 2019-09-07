@@ -31,6 +31,7 @@ class Playlist:
         prepared = types.SimpleNamespace(
             active=True,
             path=source['path'],
+            name=source['name'] if source['name'] else source['path'],
             shuffle=bool(source.get('shuffle', False)),
             recursive=bool(source.get('recursive', self._recursive)),
             item_play_duration=int(source.get('item_play_duration', 0)),
@@ -74,16 +75,25 @@ class Playlist:
         for source in self.get_sources():
             source.active = True
 
-            if source.start_time and source.end_time:
-                if not utils.is_time_within_interval(now_time, source.start_time, source.end_time):
-                    source.active = False
-
             if source.start_date and source.end_date:
                 if not utils.is_date_within_interval(now_date, source.start_date, source.end_date):
-                    logging.warning(
-                        'Skipping: %s (reason: filename date ≠ today).' % source.path
+                    logging.info(
+                        'Skipping: "%s" (reason: outside date range).' % source.name
                     )
                     source.active = False
+                    continue
+
+            if source.start_time and source.end_time:
+                if not utils.is_time_within_interval(now_time, source.start_time, source.end_time):
+                    logging.info(
+                        'Skipping: "%s" (reason: outside time range).' % source.name
+                    )
+                    source.active = False
+                    continue
+
+            logging.info(
+                'Adding: "%s".' % source.name
+            )
 
     def get_rebuild_schedule(self):
         rebuild_schedule = []

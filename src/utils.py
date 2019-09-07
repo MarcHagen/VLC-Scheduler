@@ -3,7 +3,7 @@ import os, re
 from itertools import cycle, islice, chain, filterfalse
 
 TIME_INTERVAL_REGEX = re.compile('(\d\d:\d\d).?-.?(\d\d:\d\d)')
-DATE_INTERVAL_REGEX = re.compile('(\d\d-\d\d-\d\d\d\d).?_.?(\d\d-\d\d-\d\d\d\d)')
+DATE_INTERVAL_REGEX = re.compile('^(\d\d-\d\d-\d\d\d\d)_?(?:(\d\d-\d\d-\d\d\d\d))?')
 
 
 def list_files_with_extensions(path, extensions, recursive=False):
@@ -44,6 +44,9 @@ def parse_date_interval(string):
 
     if not match:
         raise ValueError
+
+    if not match[2]:
+        return match[1], match[1]
 
     return match[1], match[2]
 
