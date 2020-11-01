@@ -31,7 +31,7 @@ class Playlist:
         prepared = types.SimpleNamespace(
             active=True,
             path=source['path'],
-            name=source['name'] if source['name'] else source['path'],
+            name=source.get('name', source.get('path')),
             shuffle=bool(source.get('shuffle', False)),
             recursive=bool(source.get('recursive', self._recursive)),
             item_play_duration=int(source.get('item_play_duration', 0)),
